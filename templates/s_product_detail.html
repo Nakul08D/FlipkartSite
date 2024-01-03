@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block tittle %}Seller Products{% endblock tittle %}
+
+{% block body %}
+
+<div class="container">
+     
+    <div>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th>image</th>
+                <th>Description</th>
+                
+            </tr>
+            {% for i in st %}
+                <tr>
+                <td>{{i.name}}</td>
+                <td>{{i.price}}</td>
+                <td>{{i.description}}</td>
+                {% if i.img %}
+                    <td>
+                        <img src="{{i.img.url}}" alt="img" height="30px">
+                    </td>
+                {% else %}
+                    <td><img src="{% static 'image1.jpg'%}" alt="" height="30px"></td>
+                {% endif %}
+                </tr>
+            {% endfor %}
+        </table>
+        <div>
+            <p><a href="/s_product/">Add More Product</a></p>
+        </div>
+    </div>
+    
+</div>
+
+{% endblock body %}

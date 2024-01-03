@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block tittle %}Home{% endblock tittle %}
+
+{% block body %}
+
+<div class="container">
+    <div id="carouselExampleFade" class="carousel slide carousel-fade" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="https://source.unsplash.com/1600x400/?clothes" class="d-block w-100" alt="...">
+            </div>
+            <div class="carousel-item">
+                <img src="https://source.unsplash.com/1600x400/?Electronics" class="d-block w-100" alt="...">
+            </div>
+            <div class="carousel-item">
+                <img src="https://source.unsplash.com/1600x400/?Hardware" class="d-block w-100" alt="...">
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleFade" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleFade" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</div>
+
+<div class="container ">
+    <p>
+    <h4>Hot Deals:</h4>
+    </p>
+    <section style="background-color: #eee;">
+        <div class="container p-3 m-auto">
+            <div class="row">
+                {% for i in products %}
+                <div class="col-md-12 col-lg-3 mb-1 mb-lg-0 mt-1">
+                    <div class="card m-auto">
+                        <div class="d-flex justify-content-between p-1">
+
+
+                        </div>
+                        <img src="{{i.img.url}}" class="card-img-top" height="100px" alt="Laptop">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <p class="small"><a href="/view_item/{{i.id}}"
+                                        class="text-muted">{{i.product_category.category}}</a></p>
+                                <p class="small text-danger"><s>Rs.{% widthratio i.price 1 2 %}</s></p>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-3">
+                                <h5 class="mb-0">{{i.name}}</h5>
+                                <h5 class="text-dark mb-0">Rs.{{i.price}}</h5>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-2">
+                                {% if i.quantity < 1%} <p class="small text-danger"><s><b>Out Of Stock</b></s></p>
+                                    {% else %}
+                                    <p class="text-muted mb-0">Available: <span class="fw-bold">{{i.quantity}}</span>
+                                    </p>
+                                    {% endif %}
+
+                                    <div class="ms-auto text-warning">
+                                        <a href="/add_to_cart/{{i.id}}"
+                                            class="btn btn-outline-primary btn-sm fa fa-star">Add to Cart</a>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<!-- {% comment %} <div class="container mt-3">
+    <div class="row">
+        <p>
+        <h4>Hot Deals</h4>
+        </p>
+        {% for i in products %}
+        <div class="col-4">
+
+            <div class="card m-2" style="width: 18rem;">
+                <img src="{{i.img.url}}" class="card-img-top" alt="" height="80px">
+                <div class="card-body">
+                    <h6 class="card-title">Rs.{{i.price}}</h6>
+                    <p class="card-text">{{i.name}}</p>
+                    <p class="card-text text-sm">{{i.description|slice:":25"}}....</p>
+
+                    <a href="/add_to_cart/{{i.id}}" class="btn btn-outline-primary btn-sm">Add to Cart</a>
+                    <a href="/view_item/{{i.id}}" class="btn btn-outline-primary btn-sm">View item</a>
+                </div>
+            </div>
+        </div>
+
+        {% endfor %}
+    </div> -->
+<!-- </div> {% endcomment %} -->
+{% endblock body %}

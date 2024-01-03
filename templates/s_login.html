@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block tittle %}Login Form{% endblock tittle %}
+
+{% block body %}
+
+<div class="container">
+
+    <div class="container pt-5">
+        <div class="row">
+            <div class="col-4 p-3 shadow-lg m-auto text-center">
+                <h4>Login to Register...</h4>
+
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="username" name="username">
+                        <label for="username">Username</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="password" class="form-control" id="password" name="password">
+                        <label for="password">Password</label>
+                    </div>
+                    <input type="submit" class="btn btn-success mx-auto" value="Login"><br>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock body %}

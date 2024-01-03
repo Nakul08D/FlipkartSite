@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block tittle %}Seller_Wallet{% endblock tittle %}
+
+{% block body %}
+
+<div class="container mt-5">
+    <div class="row ">
+        <div class="col d-flex justify-content-center">
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title">Wallet</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{user.username}}</h6>
+                    <p class="card-text">Your Wallet Amount is Rs.{{wallet.fund}}</p>
+                    <a class="btn btn-outline-secondary btn-sm" href="#" role="button">Add Fund</a>
+                    <a class="btn btn-outline-secondary btn-sm m-auto" href="/s_product/" role="button">Add Product</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock body %}
