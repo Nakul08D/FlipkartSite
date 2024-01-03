@@ -58,4 +58,7 @@ class Wallet(models.Model):
     def __str__(self):
         return self.user.username
     
+class NotReason(models.Model):
+    pass
+    
     
