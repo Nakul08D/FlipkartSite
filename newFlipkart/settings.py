@@ -119,7 +119,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 MEDIA_URL = '/media/'
@@ -135,3 +135,9 @@ MESSAGE_TAGS = {
     messages.INFO: "",
     50: "critical",
 }
+
+
+KEY="rzp_test_I5ISzVKL05sozZ"
+SECRET="zV6Cm3oIEB83W3bqH4jk1Dh9"
+
+

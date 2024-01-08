@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block tittle %}Payment Success{% endblock tittle %}
+
+{% block body %}
+{% load static %}
+<div class="text-center">
+
+    <div class="img-fluid">
+        <img src="{% static 'img12.jpg' %}" alt="My image" height="250px">
+    </div>
+
+    <div class="container">
+        <p>
+        <h4>Payment Successful</h4>
+        </p>
+    </div>
+    <div>
+        <a class="btn btn-primary text-center" href="/" role="button">Home</a>
+    </div>
+</div>
+
+
+{% endblock body %}

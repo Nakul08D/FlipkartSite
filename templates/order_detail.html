@@ -9,31 +9,79 @@
         <div class="col-12 d-flex justify-content-center">
             <form action="/buy/" method="post">{% csrf_token %}
                 <div class="mb-3 col-12">
-                    <label for="exampleInputPassword1" class="form-label">Name</label>
-                    <input type="text" class="form-control" id="exampleInputPassword1">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="name" name="name">
                 </div>
                 <div class="mb-3">
-                    <label for="exampleInputEmail1" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp">
 
                 </div>
                 <div class="mb-3">
-                    <label for="exampleInputPassword1" class="form-label">Number</label>
-                    <input type="number" class="form-control" id="exampleInputPassword1">
+                    <label for="number" class="form-label">Number</label>
+                    <input type="number" class="form-control" id="number" name="number">
                 </div>
                 <div class="mb-3">
-                    <label for="exampleInputPassword1" class="form-label">Address1</label>
-                    <input type="text" class="form-control" id="exampleInputPassword1">
+                    <label for="address1" class="form-label">Address1</label>
+                    <input type="text" class="form-control" id="address1" name="address1">
+                </div>
+                <div class="mb-3">
+                    <label for="amount" class="form-label">Amount - {{total_product_price}}</label>
                 </div>
                 <div class="mb-3 form-check">
                     <input type="checkbox" class="form-check-input" id="exampleCheck1">
                     <label class="form-check-label" for="exampleCheck1">Check me out</label>
                 </div>
-                <button type="submit" class="btn btn-primary">Buy</button>
+                <button type="submit"  id="rzp-button" class="btn btn-primary">Buy</button>
+                <button id="rzp-button1" type="">Buy</button>
+
             </form>
         </div>
     </div>
-
 </div>
+
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+var options = {
+    "key": "rzp_test_I5ISzVKL05sozZ", 
+    "amount": "{{payment.amount}}", 
+    "currency": "INR",
+    "name": "NewFlipkart",
+    "description": "Test Transaction",
+    "image": "https://example.com/your_logo",
+    "order_id": "{{payment.id}}", 
+    "handler": function (response){
+
+        window.location.href = `http://127.0.0.1:8000/success/?razorpay_payment_id=${response.razorpay_payment_id}&razorpay_order_id=${response.razorpay_order_id}&razorpay_signature=${response.razorpay_signature}`
+
+    },
+    "prefill": {
+        "name": "Gaurav Kumar",
+        "email": "gaurav.kumar@example.com",
+        "contact": "9121424260"
+    },
+    "notes": {
+        "address": "Razorpay Corporate Office"
+    },
+    "theme": {
+        "color": "#3399cc"
+    }
+};
+var rzp1 = new Razorpay(options);
+rzp1.on('payment.failed', function (response){
+        alert(response.error.code);
+        alert(response.error.description);
+        alert(response.error.source);
+        alert(response.error.step);
+        alert(response.error.reason);
+        alert(response.error.metadata.order_id);
+        alert(response.error.metadata.payment_id);
+});
+document.getElementById('rzp-button1').onclick = function(e){
+    rzp1.open();
+    e.preventDefault();
+}
+</script>
 
 {% endblock body %}

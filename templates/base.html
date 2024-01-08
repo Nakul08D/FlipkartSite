@@ -36,7 +36,7 @@
                     aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="w-50 border px-3 rounded-pill d-flex bg-white">
+                <div class="border px-3 rounded-pill d-flex bg-white" style="width: 45%;">
                     <i class="bi bi-search pe-2" style="color: rgb(159, 156, 156);"></i>
                     <input type="text" class="w-100 bg-white border-0 search-box" style="font-size: small;"
                         placeholder="Search for products and More">
@@ -62,7 +62,7 @@
                             <a class="nav-link  ms-3" href="view_cart/"><img
                                     src="https://static-assets-web.flixcart.com/batman-returns/batman-returns/p/images/header_cart-eed150.svg"
                                     alt="Cart" class="_1XmrCc p-1" width="24" height="24">Cart<span
-                                     class="badge bg-danger">{% comment %}{{cart_count}}{% endcomment %}</span></a> 
+                                    class="badge bg-danger">{% comment %}{{cart_count}}{% endcomment %}</span></a>
 
                         </li>
                         <li class="nav-item dropdown">
@@ -78,6 +78,8 @@
                                 <li><a class="dropdown-item small px-auto" href="/s_sign_in/">Sign In</a></li>
                             </ul>
                         </li>
+                        <li><a class="btn btn-outline-secondary border border-0 m-auto px-2 py-0 my-2 mx-3"
+                                href="/">Back</a></li>
                     </ul>
 
                 </div>

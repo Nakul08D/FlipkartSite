@@ -58,7 +58,19 @@ class Wallet(models.Model):
     def __str__(self):
         return self.user.username
     
-class NotReason(models.Model):
-    pass
+class Buy_detail(models.Model):
+    buyer=models.ForeignKey(Buyer,on_delete=models.CASCADE)
+    name=models.CharField( max_length=50)
+    email=models.EmailField(max_length=254)
+    number=models.IntegerField()
+    address=models.CharField(max_length=100)
+    total_amount=models.IntegerField()
+    order_id=models.CharField(max_length=100, null=True, blank=True)
+    razorpay_payment_id=models.CharField(max_length=100, null=True, blank=True)
+    is_paid=models.BooleanField(default=False)
+    
+
+    def __str__(self):
+        return self.name
     
     

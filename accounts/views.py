@@ -2,10 +2,12 @@
 from django.shortcuts import render,redirect,HttpResponse
 from django.contrib import messages
 from django.contrib.auth.models import User
+from accounts.models import Seller_Product,Seller,Buyer,Product_Category,Cart,Wallet,Buy_detail
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
-from .models import Seller,Buyer,Seller_Product,Product_Category,Cart,Wallet
-
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+import razorpay
 
 # Create your views here.
 
@@ -73,11 +75,13 @@ def b_login(request):
             password=request.POST.get('password')
             
             if not User.objects.filter(username = username).exists():
+                messages.info(request,"You entered wrong credential Check again....")
                 return redirect('b_login')
             
             user = User.objects.get(username = username)
              
             if not Buyer.objects.filter(user_id=user.id).exists():
+                messages.info(request,"You entered wrong credential Check again....")
                 return redirect('b_login')
             
             buyer=authenticate(username=username,password=password)
@@ -85,6 +89,7 @@ def b_login(request):
                 login(request,user)
                 return redirect('/')
             else:
+                messages.info(request,"You entered wrong credential Check again....")
                 return redirect('b_login')
         
         return render(request,'b_login.html')
@@ -154,41 +159,36 @@ def add_to_cart(request,id):
     product.quantity=product.quantity-1
     product.save()
     cart=Cart.objects.filter(buyer_id=buyer.id)
-    
+         
+    if product.quantity<0:
+        messages.info(request,"Product is out of Stock")
+        return redirect('/')
     for i in cart:
         if(i.seller_Product.name==product.name):
             i.quantity=i.quantity+1
             i.save()
             return redirect('/')
-
-    if product.quantity<0:
-        print("=========++++=====: Product is out of stock")
-    else:
-        cart_item=Cart.objects.create(buyer=buyer,seller_Product=product,total_price=product.price)
-        cart_item.save()
+        
+    
+    cart_item=Cart.objects.create(buyer=buyer,seller_Product=product,total_price=product.price)
+    cart_item.save()
     
     return redirect('/')
 
 
 def view_cart(request):
-    if request.method=='POST':
-        buyer=Buyer.objects.get(user_id=request.user.id)
-        cart =buyer.cart.all()
-        cart.delete()
-        
-        return redirect('view_cart')
     
     buyer=Buyer.objects.get(user_id=request.user.id)
     # cart = Cart.objects.filter(buyer_id = buyer.id)
     cart =buyer.cart.all()
     total_quantity=0
-    total_ammount=[]
+    total_amount=[]
     for i in cart:
         i.total_price = i.quantity*i.seller_Product.price
         i.save()
-        total_ammount.append(i.total_price)
+        total_amount.append(i.total_price)
     
-    total_product_price = sum(total_ammount)
+    total_product_price = sum(total_amount)
     for i in cart:
         total_quantity=total_quantity+i.quantity
 
@@ -236,10 +236,33 @@ def wallet(request):
     else:
         return render(request,'s_wallet.html',context)
         
+def add_fund_wallet(request):
+    # buyer=Buyer.objects.get(user_id=request.user.id)
+    if request.method=='POST':
+        amount=request.POST.get('amount')
+        wallet=Wallet.objects.get(user_id=request.user.id)
+        wallet.fund=int(wallet.fund)+int(amount)
+        wallet.save()
+        messages.info(request,'Your amount is added.')
+        return render(request,'add_fund.html')
+    return render(request,'add_fund.html')
+    
 def buy_detail(request):
-    return render(request,'order_detail.html')
+    buyer=Buyer.objects.get(user_id=request.user.id)
+    cart =buyer.cart.all()
+    
+    total_amount=[]
+    for i in cart:
+        i.total_price = i.quantity*i.seller_Product.price
+        i.save()
+        total_amount.append(i.total_price)
+    
+    total_product_price = sum(total_amount)
+    return render(request,'order_detail.html',{'total_product_price':total_product_price})
 
+@csrf_exempt 
 def buy(request):
+    
     buyer=Buyer.objects.get(user_id=request.user.id)
     cart=Cart.objects.filter(buyer_id=buyer.id)
     price=0
@@ -250,14 +273,47 @@ def buy(request):
     wallet=Wallet.objects.get(user_id=request.user.id)
     if (price>wallet.fund):
         messages.info(request, "You Don't have Sufficient amount Please add more fund...")
-    else:
+    
+    elif request.method=="POST":
+        name=request.POST.get('name')
+        email=request.POST.get('email')
+        number=request.POST.get('number')
+        address=request.POST.get('address1')
+        
+        buyer=Buyer.objects.get(user_id=request.user.id)
+        cart =buyer.cart.all()
+    
+        total_amount=[]
+        for i in cart:
+            i.total_price = i.quantity*i.seller_Product.price
+            i.save()
+        total_amount.append(i.total_price)
+    
+        total_product_price = sum(total_amount)*100
+        
+        client=razorpay.Client(auth=(settings.KEY, settings.SECRET))
+        payment=client.order.create({'amount':total_product_price, 'currency':'INR', 'payment_capture':1})
+       
+        buy_detail=Buy_detail.objects.create(buyer=buyer,name=name,email=email,number=number,address=address,total_amount=total_product_price,order_id=payment['id'])
+        
+        buy_detail.save()
+        
         wallet.fund=wallet.fund-price
         wallet.save()
-        messages.info(request, "Your Order is Placed before delivery date.")
+    
         cart.delete()
-        return redirect('view_cart')
+        return render(request,"order_detail.html",{'payment':payment})
 
     return render(request,'cart_view.html',{'cart':cart})
+
+def success(request):
+    buyer=Buyer.objects.get(user_id=request.user.id)
+    buy_detail=Buy_detail.objects.filter(buyer_id=buyer.id)[::-1]
+    buy_detail[0].is_paid = True
+    buy_detail[0].save()
+    
+    return render(request,'success.html')
+    
 
 def view_item(request,id):
     

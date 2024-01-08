@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block tittle %}Add Fund{% endblock tittle %}
+
+{% block body %}
+
+<div class="container">
+    {% if messages %}
+    {% for message in messages %}
+
+    <div class="alert alert-{{ message.tags }} alert-dismissible alert-danger" role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-4 m-auto ">
+            <form action="/add_fund_wallet/" method="POST">{% csrf_token %}
+                <label for="amount">Enter Amount</label><br>
+                <input type="number" class="form-control" id="amount" name="amount">
+        </div>
+        <div class="text-center mt-2">
+            <button type="submit" class="btn btn-outline-secondary">Add</button>
+            </form>
+        </div>
+    </div>
+
+
+
+</div>
+
+
+{% endblock body %}

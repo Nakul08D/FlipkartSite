@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Seller,Buyer,Seller_Product,Product_Category,Cart,Wallet
+from .models import Seller,Buyer,Seller_Product,Product_Category,Cart,Wallet,Buy_detail
 
 # Register your models here.
 
@@ -14,6 +14,8 @@ class SPA(admin.ModelAdmin):
 admin.site.register(Product_Category)
 admin.site.register(Cart)
 admin.site.register(Wallet)
+admin.site.register(Buy_detail)
+
 
 
 
