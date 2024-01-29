@@ -3,7 +3,7 @@ from django.contrib.auth.models import  User
 
 
 class Buyer(models.Model):
-    user=models.OneToOneField(User, on_delete=models.CASCADE)
+    user=models.OneToOneField(User, related_name="buyer", on_delete=models.CASCADE)
     cat=models.CharField(default="buyer", max_length=50)
     number=models.IntegerField()
     
@@ -48,7 +48,7 @@ class Cart(models.Model):
         return self.seller_Product.name
     
 class Wallet(models.Model):
-    user=models.OneToOneField(User, on_delete=models.CASCADE)
+    user=models.OneToOneField(User, on_delete=models.CASCADE, related_name='wallet')
     fund=models.IntegerField()
     user_type=models.CharField( max_length=50,
     choices=
