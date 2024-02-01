@@ -9,7 +9,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 import razorpay
 
-# Create your views here.
 
 def home(request):
     # if request.user.is_anonymous:
@@ -24,11 +23,13 @@ def s_login(request):
         password=request.POST.get('password')
         
         if not User.objects.filter(username = username).exists():
+            messages.info(request,"You entered wrong credential Check again....")
             return redirect('s_login')
             
         user = User.objects.get(username = username)
         
         if not Seller.objects.filter(user_id=user.id).exists():
+            messages.info(request,"You have to login first....")
             return redirect('s_login')
         
         seller=authenticate(username=username,password=password)
@@ -56,18 +57,26 @@ def s_sign_info(request):
         address=request.POST.get('address')
         city=request.POST.get('city')
         
-        if(password1==password2):
-            user=User.objects.create_user(username=username,first_name=fname,last_name=lname,email=email,password=password1)
-            user.save()
+        user=User.objects.all()
         
-            seller=Seller.objects.create(user=user,number=number,address=address,city=city)
-            seller.save()
-        else:
-            print("Password are not same..")
-        
-        return render(request,'s_login.html')
+        if not User.objects.filter(username=username).exists():
     
-
+            if(password1==password2):
+                user=User.objects.create_user(username=username,first_name=fname,last_name=lname,email=email,password=password1)
+                user.save()
+            
+                seller=Seller.objects.create(user=user,number=number,address=address,city=city)
+                Wallet.objects.create(user=user,fund=0, user_type='seller')
+                seller.save()
+                
+            else:
+               messages.info(request,"Password should be same....")
+        else:
+            messages.info(request, "The usename is already taken use different..")
+            return render(request, 's_sign.html' )
+        
+    return render(request,'s_login.html')
+    
         
 def b_login(request):
         if request.method=="POST":
@@ -81,7 +90,7 @@ def b_login(request):
             user = User.objects.get(username = username)
              
             if not Buyer.objects.filter(user_id=user.id).exists():
-                messages.info(request,"You entered wrong credential Check again....")
+                messages.info(request,"You have to login first....")
                 return redirect('b_login')
             
             buyer=authenticate(username=username,password=password)
@@ -96,10 +105,12 @@ def b_login(request):
     
 def b_logout(request):
     logout(request)
+    messages.info(request, "You are logout")
     return redirect('home.html')
 
 def s_logout(request):
     logout(request)
+    messages.info(request, "You are logout")
     return redirect('home.html')
 
 
@@ -119,11 +130,13 @@ def b_sign_in(request):
             user.save()
             
             buyer=Buyer.objects.create(user=user,number=number)
+            Wallet.objects.create(user=user,fund=0, user_type='buyer')
             buyer.save()
                                          
             return render(request,'b_login.html')
         else:
-            print("Password are not same..")
+            messages.info(request, "You are logout")
+            
     return render(request,'b_sign.html')
 
 
@@ -137,16 +150,24 @@ def s_product(request):
         
         cat=Product_Category.objects.get(category=category)
         seller=Seller.objects.get(user_id=request.user.id)
-    
-        product=Seller_Product.objects.create(seller=seller,name=name,product_category=cat,img=img,price=price,description=description)
-        product.save()
-        
+        if not Seller_Product.objects.filter(name=name).exists():
+            product=Seller_Product.objects.create(seller=seller,name=name,product_category=cat,img=img,price=price,description=description)
+            messages.info(request, "Your Product is added.")
+            product.save()
+        else:
+          # product= Seller_Product.objects.get(name=name)
+            pass
     return render(request,'s_product.html')
 
 def s_product_detail(request):
     
     seller=Seller.objects.get(user_id=request.user.id)
+    if(seller is None):
+        messages.info(request, "You have to login as seller...")
+        
     product=Seller_Product.objects.filter(seller_id=seller.id)
+    if(product is None):
+        messages.info(request, "You have to upload any product..")
 
     context={'st':product}
     
@@ -155,6 +176,8 @@ def s_product_detail(request):
 def add_to_cart(request,id):
     
     buyer=Buyer.objects.get(user=request.user)
+    if buyer is None:
+        messages.info(request, "You have to login First..")
     product=Seller_Product.objects.get(id=id)
     product.quantity=product.quantity-1
     product.save()
@@ -178,8 +201,11 @@ def add_to_cart(request,id):
 
 def view_cart(request):
     
+    if not Buyer.objects.filter(user_id=request.user.id).exists():
+        messages.info(request, "You have to login as buyer First..")
+        return redirect('home')
     buyer=Buyer.objects.get(user_id=request.user.id)
-    # cart = Cart.objects.filter(buyer_id = buyer.id)
+    cart = Cart.objects.filter(buyer_id = buyer.id)
     cart =buyer.cart.all()
     total_quantity=0
     total_amount=[]
@@ -240,10 +266,13 @@ def add_fund_wallet(request):
     # buyer=Buyer.objects.get(user_id=request.user.id)
     if request.method=='POST':
         amount=request.POST.get('amount')
+        if int(amount)<1:
+            messages.error(request, "Amount should be greater then 1..")
+            return redirect('add_fund')
         wallet=Wallet.objects.get(user_id=request.user.id)
         wallet.fund=int(wallet.fund)+int(amount)
         wallet.save()
-        messages.info(request,'Your amount is added.')
+        messages.success(request,'Your amount is added.')
         return render(request,'add_fund.html')
     return render(request,'add_fund.html')
     
@@ -339,10 +368,18 @@ def add(request,id):
 def minus(request,id):
     cart=Cart.objects.get(id=id)
     cart.quantity=cart.quantity-1
+
+    if cart.quantity==0:
+        cart.delete()
+        product = Seller_Product.objects.get(id=cart.seller_Product.id)
+        product.quantity=product.quantity+1
+        product.save()
+        return redirect('view_cart')    
     product = Seller_Product.objects.get(id=cart.seller_Product.id)
     product.quantity=product.quantity+1
     product.save()
     cart.save()
     
     return redirect('view_cart')
-    
+
+

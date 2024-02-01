@@ -7,13 +7,35 @@
 <div class="container">
     {% if messages %}
     {% for message in messages %}
-
-    <div class="alert alert-{{ message.tags }} alert-dismissible alert-danger" role="alert">
+    {% if message.tags == "error" %}
+    <div class="alert alert-danger alert-dismissible " role="alert">
+    {% else %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible " role="alert">
+    {% endif %}
         <strong>{{ message }}</strong>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     {% endfor %}
-    {% endif %}
+    {% endif %} 
+
+    <!-- template.html -->
+{% comment %} {% if messages %}
+  {% for message in messages %}
+    <div id="dismiss-alert" class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  <script> {% endcomment %}
+    {% comment %} // Automatically dismiss the alert after 5 seconds (5000 milliseconds)
+    setTimeout(function() {
+      document.getElementById('dismiss-alert').style.display = 'none';
+    }, 5000);
+  </script>
+{% endif %} {% endcomment %}
+
 </div>
 
 
@@ -25,7 +47,8 @@
                 <input type="number" class="form-control" id="amount" name="amount">
         </div>
         <div class="text-center mt-2">
-            <button type="submit" class="btn btn-outline-secondary">Add</button>
+            <button type="submit" class="btn btn-outline-secondary btn-sm m-auto">Add</button>
+            <a class="btn btn-outline-secondary btn-sm m-auto" href="/s_product/" role="button">Add Product</a>
             </form>
         </div>
     </div>
