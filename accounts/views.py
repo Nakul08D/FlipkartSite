@@ -175,9 +175,10 @@ def s_product_detail(request):
 
 def add_to_cart(request,id):
     
-    buyer=Buyer.objects.get(user=request.user)
-    if buyer is None:
+    if not Buyer.objects.filter(user=request.user).exists():
         messages.info(request, "You have to login First..")
+        return redirect('/')
+    buyer=Buyer.objects.get(user_id=request.user.id)
     product=Seller_Product.objects.get(id=id)
     product.quantity=product.quantity-1
     product.save()
